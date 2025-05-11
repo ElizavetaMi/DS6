@@ -27,10 +27,11 @@ public class MoneyTransferTest {
         var firstCardBalance = dashboardPage.getCardBalance(0);
         var secondCardBalance = dashboardPage.getCardBalance(1);
 
-        int transferAmount = 10;
+        // Переводим 10% от остатка на второй карте, но минимум 1 рубль
+        int transferAmount = Math.max(secondCardBalance / 10, 1);
 
         var transferPage = dashboardPage.chooseCardToReplenish(0);
-        dashboardPage = transferPage.makeTransfer(transferAmount, DataHelper.getCardNumber(1));
+        dashboardPage = transferPage.makeTransfer(transferAmount, DataHelper.getCardByIndex(1).getNumber());
 
         var expectedFirstCardBalance = firstCardBalance + transferAmount;
         var expectedSecondCardBalance = secondCardBalance - transferAmount;
@@ -39,10 +40,9 @@ public class MoneyTransferTest {
         assertEquals(expectedSecondCardBalance, dashboardPage.getCardBalance(1));
     }
 
+
     @Test
     void shouldNotAllowTransferMoreThanAvailable() {
-        open("http://localhost:9999");
-
         var loginPage = new LoginPage();
         var authInfo = DataHelper.getAuthInfo();
         var verificationPage = loginPage.validLogin(authInfo.getLogin(), authInfo.getPassword());
@@ -50,13 +50,13 @@ public class MoneyTransferTest {
         var dashboardPage = verificationPage.validVerify(verificationCode.getCode());
 
         var balanceFromCard = dashboardPage.getCardBalance(1);
-
-        int transferAmount = balanceFromCard + 1;
+        int transferAmount = balanceFromCard + 1; // на 1 рубль больше, чем есть
 
         var transferPage = dashboardPage.chooseCardToReplenish(0);
+        transferPage.makeTransfer(transferAmount, DataHelper.getCardByIndex(1).getNumber());
 
-        transferPage.makeTransfer(transferAmount, DataHelper.getCardNumber(1));
         transferPage.shouldShowError("Ошибка! Недостаточно средств на карте");
     }
+
 }
 

@@ -2,6 +2,8 @@ package ru.netology.data;
 
 import lombok.Value;
 
+import java.util.List;
+
 public class DataHelper {
 
     // Данные для авторизации
@@ -29,5 +31,22 @@ public class DataHelper {
     @Value
     public static class VerificationCode {
         String code;
+    }
+
+    @Value
+    public static class CardInfo {
+        String number;
+        String id;
+    }
+
+    public static List<CardInfo> getCards() {
+        return List.of(
+                new CardInfo("5559 0000 0000 0001", "01"),
+                new CardInfo("5559 0000 0000 0002", "02")
+        );
+    }
+
+    public static CardInfo getCardByIndex(int index) {
+        return getCards().get(index);
     }
 }
